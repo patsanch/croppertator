@@ -1,0 +1,48 @@
+Sample Usage
+=============
+
+Note: Cropping is shown after image has been uploaded. Rotating is done on a different view.
+
+user.rb
+
+after_update :reprocess_avatar, :if => :cropping?
+
+has_attached_file :avatar, :styles => { 
+  :thumb => {:geometry => "100x100#", :processors => [:croppertator]}, 
+  :large => {:geometry => "500x500>"} 
+}
+
+attr_accessor :rotation_degrees, :rotate
+
+def rotate!(degrees = 90)
+  self.rotation += degrees
+  self.rotation -= 360 if self.rotation >= 360
+  self.rotation += 360 if self.rotation <= -360
+
+  self.rotate = true
+  self.avatar.reprocess!
+  self.save
+end
+
+def rotating?
+  !self.rotation.nil? and self.rotate
+end
+
+def cropping?
+  !crop_x.blank? && !crop_y.blank? && !crop_w.blank? && !crop_h.blank?
+end
+
+def avatar_geometry(style = :original)  
+  @geometry ||= {}  
+  @geometry[style] ||= Paperclip::Geometry.from_file(avatar.path(style))  
+end
+
+def ratio
+  avatar_geometry(:original).width/avatar_geometry(:large).width
+end
+
+private
+
+def reprocess_avatar
+  avatar.reprocess!  
+end
