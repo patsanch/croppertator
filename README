@@ -1,7 +1,8 @@
 Sample Usage
 =============
 
-Note: Cropping is shown after image has been uploaded. Rotating is done on a different view.
+Note: 
+Cropping and Rotating are done in different views.
 
 user.rb
 
